@@ -22,15 +22,17 @@ def verify_log_entry(log_entry):
     return False
 
 
-def print_dict(dictionary) -> None:
+def output_format(file_size, dictionary) -> None:
     """print dictionary"""
+    print("File size: {}".format(file_size), flush=True)
     for key, val in dictionary.items():
         if val == 0:
             continue
-        print(f"{key}: {val}")
+        print("{}: {}".format(key, val), flush=True)
 
 
 def dict_of_status_code():
+    """Returns possible status code"""
     return {
         "200": 0,
         "301": 0,
@@ -55,8 +57,7 @@ def stats_computation():
             if verify_log_entry(line):
                 if counter == 11:
                     counter = 0
-                    print(f"File size: {file_size}")
-                    print_dict(dict_of_code)
+                    output_format(file_size, dict_of_code)
                     dict_of_code = dict_of_status_code()
                 counter += 1
                 file_size += int(line.rstrip().split()[-1])
@@ -64,8 +65,7 @@ def stats_computation():
                 if status_code in dict_of_code.keys():
                     dict_of_code[status_code] += 1
     except KeyboardInterrupt:
-        print(f"File size: {file_size}")
-        print_dict(dict_of_status_code)
+        output_format(file_size, dict_of_code)
 
 
 def main():
