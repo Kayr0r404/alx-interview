@@ -58,7 +58,6 @@ def run_stats_computation():
                     output_format(file_size, dict_of_code)
                     dict_of_code = dict_of_status_code()
 
-                counter += 1
                 file_size += int(line.rstrip().split()[-1])
                 status_code = line.rstrip().split()[-2]
 
@@ -66,6 +65,7 @@ def run_stats_computation():
                     int(status_code), int
                 ):
                     dict_of_code[status_code] += 1
+            counter += 1
     except (KeyboardInterrupt, EOFError):
         output_format(file_size, dict_of_code)
 
