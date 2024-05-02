@@ -49,7 +49,6 @@ def run_stats_computation():
     counter, file_size = 1, 0
 
     dict_of_code = dict_of_status_code()
-    print()
     try:
         for line in sys.stdin:
 
