@@ -29,6 +29,7 @@ def output_format(file_size, status_code_counts):
 
 def run_stats_computation():
     """Read stdin line by line and compute metrics"""
+    counter = 0
     total_file_size = 0
     status_code_counts = {
         "200": 0,
@@ -56,8 +57,10 @@ def run_stats_computation():
                 if status_code in status_code_counts:
                     status_code_counts[status_code] += 1
 
+                counter += 1
+
                 # Check if we need to print metrics (every 10 lines)
-                if total_file_size > 0 and (total_file_size % 10 == 0):
+                if total_file_size > 0 and (counter % 10 == 0):
                     output_format(total_file_size, status_code_counts)
                     # Reset counts after printing
                     total_file_size = 0
