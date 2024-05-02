@@ -30,11 +30,8 @@ def print_dict(dictionary) -> None:
         print(f"{key}: {val}")
 
 
-def stats_computation():
-    """reads stdin line by line and computes metrics:"""
-    counter, file_size = 1, 0
-
-    dict_of_status_code = {
+def dict_of_status_code():
+    return {
         "200": 0,
         "301": 0,
         "400": 0,
@@ -44,6 +41,14 @@ def stats_computation():
         "405": 0,
         "500": 0,
     }
+
+
+def stats_computation():
+    """reads stdin line by line and computes metrics:"""
+    counter, file_size = 1, 0
+
+    dict_of_code = dict_of_status_code()
+    print()
     try:
         for line in sys.stdin:
 
@@ -51,12 +56,13 @@ def stats_computation():
                 if counter == 11:
                     counter = 0
                     print(f"File size: {file_size}")
-                    print_dict(dict_of_status_code)
+                    print_dict(dict_of_code)
+                    dict_of_code = dict_of_status_code()
                 counter += 1
                 file_size += int(line.rstrip().split()[-1])
                 status_code = line.rstrip().split()[-2]
-                if status_code in dict_of_status_code.keys():
-                    dict_of_status_code[status_code] += 1
+                if status_code in dict_of_code.keys():
+                    dict_of_code[status_code] += 1
     except KeyboardInterrupt:
         print(f"File size: {file_size}")
         print_dict(dict_of_status_code)
