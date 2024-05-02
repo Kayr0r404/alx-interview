@@ -25,10 +25,10 @@ def verify_log_entry(log_entry):
 def output_format(file_size, dictionary) -> None:
     """print dictionary"""
     print("File size: {}".format(file_size), flush=True)
-    for key, val in dictionary.items():
+    for key, val in sorted(dictionary.items()):
         if val == 0:
             continue
-        print("{}: {}".format(key, val), flush=True)
+        print("{:s}: {:d}".format(key, val), flush=True)
 
 
 def dict_of_status_code():
@@ -64,7 +64,7 @@ def stats_computation():
                 status_code = line.rstrip().split()[-2]
                 if status_code in dict_of_code.keys():
                     dict_of_code[status_code] += 1
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, EOFError):
         output_format(file_size, dict_of_code)
 
 
