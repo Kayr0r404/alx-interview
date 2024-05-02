@@ -1,76 +1,53 @@
 #!/usr/bin/python3
-"""Log parsing"""
-
-
 import sys
 import re
+from collections import defaultdict
 
 
-def verify_log_entry(log_entry):
-    """verify the stdin format"""
-    # Define the regex pattern to match the specified format
+def parse_log_line(line):
+    # Regular expression to match the log line format
     pattern = (
-        r"^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) - "
-        r'\[(.*?)\] "GET /projects/260 HTTP/1\.1" '
-        r"(\d{3}) (\d+)$"
+        r'^(\d+\.\d+\.\d+\.\d+) - \[(.*?)\] "GET /projects/260 HTTP/1.1" (\d+) (\d+)$'
     )
-
-    # Use re.match to check if the log entry matches the pattern
-    match = re.match(pattern, log_entry)
+    match = re.match(pattern, line)
     if match:
-        return True
-    return False
+        ip_address = match.group(1)
+        status_code = int(match.group(3))
+        file_size = int(match.group(4))
+        return ip_address, status_code, file_size
+    else:
+        return None
 
 
-def output_format(file_size, dictionary) -> None:
-    """print dictionary"""
-    print("File size: {}".format(file_size), flush=True)
-    for key, val in sorted(dictionary.items()):
-        if val == 0:
-            continue
-        print("{:s}: {:d}".format(key, val), flush=True)
-
-
-def dict_of_status_code():
-    """Returns possible status code"""
-    return {
-        "200": 0,
-        "301": 0,
-        "400": 0,
-        "401": 0,
-        "403": 0,
-        "404": 0,
-        "405": 0,
-        "500": 0,
-    }
-
-
-def stats_computation():
-    """reads stdin line by line and computes metrics:"""
-    counter, file_size = 1, 0
-
-    dict_of_code = dict_of_status_code()
-    print()
-    try:
-        for line in sys.stdin:
-
-            if verify_log_entry(line):
-                if counter == 11:
-                    counter = 0
-                    output_format(file_size, dict_of_code)
-                    dict_of_code = dict_of_status_code()
-                counter += 1
-                file_size += int(line.rstrip().split()[-1])
-                status_code = line.rstrip().split()[-2]
-                if status_code in dict_of_code.keys():
-                    dict_of_code[status_code] += 1
-    except (KeyboardInterrupt, EOFError):
-        output_format(file_size, dict_of_code)
+def print_metrics(total_file_size, status_code_counts):
+    print(f"Total file size: {total_file_size}")
+    for code in sorted(status_code_counts.keys()):
+        print(f"{code}: {status_code_counts[code]}")
 
 
 def main():
-    """main func"""
-    stats_computation()
+    total_file_size = 0
+    status_code_counts = defaultdict(int)
+    line_count = 0
+
+    try:
+        for line in sys.stdin:
+            line = line.strip()
+            parsed = parse_log_line(line)
+            if parsed:
+                _, status_code, file_size = parsed
+                total_file_size += file_size
+                status_code_counts[status_code] += 1
+                line_count += 1
+
+            # Print metrics every 10 lines or upon interruption
+            if line_count == 10:
+                print_metrics(total_file_size, status_code_counts)
+                line_count = 0
+
+    except KeyboardInterrupt:
+        # If interrupted by CTRL + C, print final metrics
+        print_metrics(total_file_size, status_code_counts)
 
 
 if __name__ == "__main__":
