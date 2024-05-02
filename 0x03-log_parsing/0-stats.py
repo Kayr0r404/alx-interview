@@ -21,10 +21,12 @@ def verify_log_entry(log_entry):
 def print_dict(dictionary) -> None:
     """print dictionary"""
     for key, val in dictionary.items():
+        if val == 0:
+            continue
         print(f"{key}: {val}")
 
 
-def stats():
+def stats_computation():
     """reads stdin line by line and computes metrics:"""
     counter, file_size = 1, 0
 
@@ -54,7 +56,7 @@ def stats():
 
 def main():
     """main func"""
-    stats()
+    stats_computation()
 
 
 if __name__ == "__main__":
