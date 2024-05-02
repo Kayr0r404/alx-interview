@@ -46,21 +46,25 @@ def dict_of_status_code():
 
 def run_stats_computation():
     """reads stdin line by line and computes metrics:"""
-    counter, file_size = 1, 0
+    counter, file_size = 0, 0
 
     dict_of_code = dict_of_status_code()
     try:
         for line in sys.stdin:
 
             if verify_log_entry(line):
-                if counter == 11:
+                if counter == 10:
                     counter = 0
                     output_format(file_size, dict_of_code)
                     dict_of_code = dict_of_status_code()
+
                 counter += 1
                 file_size += int(line.rstrip().split()[-1])
                 status_code = line.rstrip().split()[-2]
-                if status_code in dict_of_code.keys():
+
+                if status_code in dict_of_code.keys() and isinstance(
+                    int(status_code), int
+                ):
                     dict_of_code[status_code] += 1
     except (KeyboardInterrupt, EOFError):
         output_format(file_size, dict_of_code)
