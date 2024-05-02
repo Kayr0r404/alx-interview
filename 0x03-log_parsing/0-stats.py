@@ -18,19 +18,44 @@ def verify_log_entry(log_entry):
     return False
 
 
+def print_dict(dictionary) -> None:
+    """print dictionary"""
+    for key, val in dictionary.items():
+        print(f"{key}: {val}")
+
+
 def stats():
     """reads stdin line by line and computes metrics:"""
     counter, file_size = 1, 0
+
+    dict_of_status_code = {
+        "200": 0,
+        "301": 0,
+        "400": 0,
+        "401": 0,
+        "403": 0,
+        "404": 0,
+        "405": 0,
+        "500": 0,
+    }
     for line in sys.stdin:
 
         if verify_log_entry(line):
-            if counter == 10:
+            if counter == 11:
                 counter = 0
                 print(f"File size: {file_size}")
+                print_dict(dict_of_status_code)
             counter += 1
             file_size += int(line.rstrip().split()[-1])
+            status_code = line.rstrip().split()[-2]
+            if status_code in dict_of_status_code.keys():
+                dict_of_status_code[status_code] += 1
 
 
 def main():
     """main func"""
     stats()
+
+
+if __name__ == "__main__":
+    main()
