@@ -52,6 +52,7 @@ def run_stats_computation():
     try:
         for line in sys.stdin:
 
+            counter += 1
             if verify_log_entry(line):
                 if counter == 10:
                     counter = 0
@@ -65,7 +66,6 @@ def run_stats_computation():
                     int(status_code), int
                 ):
                     dict_of_code[status_code] += 1
-            counter += 1
     except (KeyboardInterrupt, EOFError):
         output_format(file_size, dict_of_code)
 
