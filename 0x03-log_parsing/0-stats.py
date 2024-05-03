@@ -16,7 +16,10 @@ def verify_log_entry(log_entry):
     )
     # Use re.match to check if the log entry matches the pattern
     match = re.match(pattern, log_entry)
-    return match
+    if match:
+        status_code = match.group(3)
+        file_size = int(match.group(4))
+    return {"status_code": status_code, "file_size": file_size}
 
 
 def output_format(file_size, status_code_counts):
@@ -44,41 +47,19 @@ def run_stats_computation():
 
     try:
         for line in sys.stdin:
-            line = line.strip()
-            match = verify_log_entry(line)
-            if match:
-                status_code = match.group(3)
-                file_size = int(match.group(4))
 
-                # Increment file size
-                total_file_size += file_size
+            line_info = verify_log_entry(line)
+            status_code = line_info.get("status_code", "0")
+            if status_code in status_code_counts.keys():
+                status_code_counts[status_code] += 1
+            # total_file_size + line_info['file_size']
 
-                # Increment status code count if valid
-                if status_code in status_code_counts:
-                    status_code_counts[status_code] += 1
-
-                counter += 1
-
-                # Check if we need to print metrics (every 10 lines)
-                if total_file_size > 0 and (counter % 10 == 0):
-                    output_format(total_file_size, status_code_counts)
-                    # Reset counts after printing
-                    total_file_size = 0
-                    status_code_counts = {
-                        "200": 0,
-                        "301": 0,
-                        "400": 0,
-                        "401": 0,
-                        "403": 0,
-                        "404": 0,
-                        "405": 0,
-                        "500": 0,
-                    }
-
-    except KeyboardInterrupt:
-        # Handle keyboard interrupt (CTRL + C)
-        if total_file_size > 0:
-            output_format(total_file_size, status_code_counts)
+            total_file_size += line_info.get("file_size", "0")
+            counter += 1
+            if counter % 10 == 0:
+                output_format(total_file_size, status_code_counts)
+    except (KeyboardInterrupt, EOFError):
+        output_format(total_file_size, status_code_counts)
 
 
 if __name__ == "__main__":
