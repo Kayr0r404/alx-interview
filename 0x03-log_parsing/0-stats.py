@@ -31,10 +31,11 @@ def verify_log_entry(log_entry):
 
 def output_format(file_size, status_code_counts):
     """Print the computed metrics"""
-    print(f"Total file size: {file_size}")
-    for code in sorted(status_code_counts):
-        if status_code_counts[code] > 0:
-            print(f"{code}: {status_code_counts[code]}")
+    print('File size: {:d}'.format(total_file_size), flush=True)
+    for status_code in sorted(status_codes_stats.keys()):
+        num = status_codes_stats.get(status_code, 0)
+        if num > 0:
+            print('{:s}: {:d}'.format(status_code, num), flush=True)
 
 
 def update_metrics(line, total_file_size, status_codes_stats):
