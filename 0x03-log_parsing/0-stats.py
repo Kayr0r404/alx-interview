@@ -9,33 +9,33 @@ import re
 def verify_log_entry(log_entry):
     """Verify if the log entry matches the specified format"""
     fp = (
-        r'\s*(?P<ip>\S+)\s*',
-        r'\s*\[(?P<date>\d+\-\d+\-\d+ \d+:\d+:\d+\.\d+)\]',
+        r"\s*(?P<ip>\S+)\s*",
+        r"\s*\[(?P<date>\d+\-\d+\-\d+ \d+:\d+:\d+\.\d+)\]",
         r'\s*"(?P<request>[^"]*)"\s*',
-        r'\s*(?P<status_code>\S+)',
-        r'\s*(?P<file_size>\d+)'
+        r"\s*(?P<status_code>\S+)",
+        r"\s*(?P<file_size>\d+)",
     )
     info = {
-        'status_code': 0,
-        'file_size': 0,
+        "status_code": 0,
+        "file_size": 0,
     }
-    log_fmt = '{}\\-{}{}{}{}\\s*'.format(fp[0], fp[1], fp[2], fp[3], fp[4])
-    resp_match = re.fullmatch(log_fmt, input_line)
+    log_fmt = "{}\\-{}{}{}{}\\s*".format(fp[0], fp[1], fp[2], fp[3], fp[4])
+    resp_match = re.fullmatch(log_fmt, log_entry)
     if resp_match is not None:
-        status_code = resp_match.group('status_code')
-        file_size = int(resp_match.group('file_size'))
-        info['status_code'] = status_code
-        info['file_size'] = file_size
+        status_code = resp_match.group("status_code")
+        file_size = int(resp_match.group("file_size"))
+        info["status_code"] = status_code
+        info["file_size"] = file_size
     return info
 
 
-def output_format(file_size, status_code_counts):
+def output_format(total_file_size, status_codes_stats):
     """Print the computed metrics"""
-    print('File size: {:d}'.format(total_file_size), flush=True)
+    print("File size: {:d}".format(total_file_size), flush=True)
     for status_code in sorted(status_codes_stats.keys()):
         num = status_codes_stats.get(status_code, 0)
         if num > 0:
-            print('{:s}: {:d}'.format(status_code, num), flush=True)
+            print("{:s}: {:d}".format(status_code, num), flush=True)
 
 
 def update_metrics(line, total_file_size, status_codes_stats):
