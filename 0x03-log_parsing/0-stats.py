@@ -8,18 +8,25 @@ import re
 
 def verify_log_entry(log_entry):
     """Verify if the log entry matches the specified format"""
-    # Define the regex pattern to match the specified format
-    pattern = (
-        r"[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ - \[[0-9]+-[0-9]+-[0-9]+ "
-        r'[0-9]+:[0-9]+:[0-9]+\.[0-9]+\] "GET /projects/260 HTTP/1\.1" '
-        r"([0-9]+) ([0-9]+)"
+    fp = (
+        r"\s*(?P<ip>\S+)\s*",
+        r"\s*\[(?P<date>\d+\-\d+\-\d+ \d+:\d+:\d+\.\d+)\]",
+        r'\s*"(?P<request>[^"]*)"\s*',
+        r"\s*(?P<status_code>\S+)",
+        r"\s*(?P<file_size>\d+)",
     )
-    # Use re.match to check if the log entry matches the pattern
-    match = re.match(pattern, log_entry)
-    if match:
-        file_size = int(log_entry.rstrip().split()[-1])
-        status_code = log_entry.rstrip().split()[-2]
-    return {"status_code": status_code, "file_size": file_size}
+    info = {
+        "status_code": 0,
+        "file_size": 0,
+    }
+    log_fmt = "{}\\-{}{}{}{}\\s*".format(fp[0], fp[1], fp[2], fp[3], fp[4])
+    resp_match = re.fullmatch(log_fmt, log_entry)
+    if resp_match is not None:
+        status_code = resp_match.group("status_code")
+        file_size = int(resp_match.group("file_size"))
+        info["status_code"] = status_code
+        info["file_size"] = file_size
+    return info
 
 
 def output_format(total_file_size, status_codes_stats):
