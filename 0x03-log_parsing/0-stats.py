@@ -32,10 +32,9 @@ def verify_log_entry(log_entry):
 def output_format(total_file_size, status_codes_stats):
     """Print the computed metrics"""
     print("File size: {:d}".format(total_file_size), flush=True)
-    for status_code in sorted(status_codes_stats.keys()):
-        num = status_codes_stats.get(status_code, 0)
-        if num > 0:
-            print("{:s}: {:d}".format(status_code, num), flush=True)
+    for key, val in sorted(status_codes_stats.items()):
+        if val > 0:
+            print("{:s}: {:d}".format(key, val), flush=True)
 
 
 def update_metrics(line, total_file_size, status_codes_stats):
@@ -62,7 +61,8 @@ def run_stats_computations():
         "500": 0,
     }
     try:
-        for line in sys.stdin:
+        while True:
+            line = input()
             total_file_size = update_metrics(
                 line,
                 total_file_size,
