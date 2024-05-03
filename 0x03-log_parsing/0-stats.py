@@ -32,21 +32,13 @@ def verify_log_entry(log_entry):
 def output_format(total_file_size, status_codes_stats):
     """Print the computed metrics"""
     print("File size: {:d}".format(total_file_size), flush=True)
-    for status_code in sorted(status_codes_stats.keys()):
-        num = status_codes_stats.get(status_code, 0)
-        if num > 0:
-            print("{:s}: {:d}".format(status_code, num), flush=True)
+    for key, val in sorted(status_codes_stats.items()):
+        if val > 0:
+            print("{:s}: {:d}".format(key, val), flush=True)
 
 
 def update_metrics(line, total_file_size, status_codes_stats):
-    """Updates the metrics from a given HTTP request log.
-
-    Args:
-        line (str): The line of input from which to retrieve the metrics.
-
-    Returns:
-        int: The new total file size.
-    """
+    """Updates the metrics from a given HTTP request log."""
     line_info = verify_log_entry(line)
     status_code = line_info.get("status_code", "0")
     if status_code in status_codes_stats.keys():
@@ -54,7 +46,7 @@ def update_metrics(line, total_file_size, status_codes_stats):
     return total_file_size + line_info["file_size"]
 
 
-def run():
+def run_stats_computations():
     """Starts the log parser."""
     line_num = 0
     total_file_size = 0
@@ -69,8 +61,7 @@ def run():
         "500": 0,
     }
     try:
-        while True:
-            line = input()
+        for line in sys.stdin:
             total_file_size = update_metrics(
                 line,
                 total_file_size,
@@ -84,38 +75,4 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
-
-# def run_stats_computation():
-#     """Read stdin line by line and compute metrics"""
-#     counter = 0
-#     total_file_size = 0
-#     status_code_counts = {
-#         "200": 0,
-#         "301": 0,
-#         "400": 0,
-#         "401": 0,
-#         "403": 0,
-#         "404": 0,
-#         "405": 0,
-#         "500": 0,
-#     }
-
-#     try:
-#         for line in sys.stdin:
-
-#             line_info = verify_log_entry(line)
-#             status_code = line_info.get("status_code", "0")
-#             if status_code in status_code_counts.keys():
-#                 status_code_counts[status_code] += 1
-
-#             total_file_size += line_info.get("file_size", "0")
-#             counter += 1
-#             if counter % 10 == 0:
-#                 output_format(total_file_size, status_code_counts)
-#     except (KeyboardInterrupt, EOFError):
-#         output_format(total_file_size, status_code_counts)
-
-
-# if __name__ == "__main__":
-#     run_stats_computation()
+    run_stats_computations()
