@@ -52,11 +52,7 @@ def run_stats_computation():
     try:
         while True:
             line = input()
-            counter += 1
             if verify_log_entry(line):
-                if counter % 10 == 0:
-                    output_format(file_size, dict_of_code)
-                    dict_of_code = dict_of_status_code()
 
                 file_size += int(line.rstrip().split()[-1])
                 status_code = line.rstrip().split()[-2]
@@ -65,6 +61,10 @@ def run_stats_computation():
                     int(status_code), int
                 ):
                     dict_of_code[status_code] += 1
+            counter += 1
+            if counter % 10 == 0:
+                output_format(file_size, dict_of_code)
+                dict_of_code = dict_of_status_code()
     except (KeyboardInterrupt, EOFError):
         output_format(file_size, dict_of_code)
 
