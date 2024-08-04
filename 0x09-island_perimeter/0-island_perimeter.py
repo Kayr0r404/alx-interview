@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+"""Island parameter"""
+
 
 def island_perimeter(grid):
     """find the parameter of an island"""
